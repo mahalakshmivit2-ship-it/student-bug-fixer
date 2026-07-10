@@ -10,6 +10,7 @@ import {
   type BugStatus, type BugPriority, type BugSeverity,
 } from "@/lib/bug-types";
 import { ArrowLeft, MessageSquare, Calendar, User as UserIcon } from "lucide-react";
+import type { TablesUpdate } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/bugs/$bugId")({
   component: BugDetail,
@@ -36,10 +37,17 @@ function BugDetail() {
     enabled: !!bug,
     queryFn: async () => {
       const ids = [bug!.reporter_id, bug!.assignee_id].filter(Boolean) as string[];
-      if (!ids.length) return { profiles: [], members: [] };
-      const { data: profiles } = await supabase.from("profiles").select("id, full_name, primary_role").in("id", ids);
-      const { data: members } = await supabase.from("project_members").select("user_id, profiles:profiles!inner(id, full_name)").eq("project_id", bug!.project_id);
-      return { profiles: profiles ?? [], members: members ?? [] };
+      const { data: members } = await supabase.from("project_members").select("user_id").eq("project_id", bug!.project_id);
+      const memberIds = (members ?? []).map((m) => m.user_id);
+      const allIds = Array.from(new Set([...ids, ...memberIds]));
+      const { data: profiles } = allIds.length
+        ? await supabase.from("profiles").select("id, full_name, primary_role").in("id", allIds)
+        : { data: [] };
+      const profs = profiles ?? [];
+      return {
+        profiles: profs,
+        members: (members ?? []).map((m) => ({ user_id: m.user_id, full_name: profs.find((p) => p.id === m.user_id)?.full_name ?? m.user_id.slice(0, 8) })),
+      };
     },
   });
 
@@ -53,7 +61,7 @@ function BugDetail() {
     },
   });
 
-  async function updateField(patch: Record<string, unknown>) {
+  async function updateField(patch: TablesUpdate<"bugs">) {
     const { error } = await supabase.from("bugs").update(patch).eq("id", bugId);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["bug", bugId] });
@@ -155,7 +163,7 @@ function BugDetail() {
               <dd className="mt-1">
                 <select value={bug.assignee_id ?? ""} onChange={(e) => updateField({ assignee_id: e.target.value || null })} className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm">
                   <option value="">Unassigned</option>
-                  {participants?.members.map((m) => <option key={m.user_id} value={m.user_id}>{m.profiles.full_name}</option>)}
+                  {participants?.members.map((m) => <option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}
                 </select>
               </dd>
             </div>
