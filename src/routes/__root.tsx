@@ -88,9 +88,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Report, assign, and track bugs across your college projects with a modern Kanban workflow, dashboards, and team collaboration." },
       { name: "author", content: "BugTrack Pro" },
       { property: "og:title", content: "BugTrack Pro — Student Bug Tracking System" },
-      { property: "og:description", content: "Modern bug tracking for student teams. Kanban, dashboards, reports, and role-based access." },
+      { property: "og:description", content: "Report, assign, and track bugs across your college projects with a modern Kanban workflow, dashboards, and team collaboration." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "BugTrack Pro — Student Bug Tracking System" },
+      { name: "twitter:description", content: "Report, assign, and track bugs across your college projects with a modern Kanban workflow, dashboards, and team collaboration." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/25b35227-9785-4612-98a0-031d2d6fe3da/id-preview-442edc11--23fbf327-c71a-4781-a047-103adbc2fb66.lovable.app-1783642424609.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/25b35227-9785-4612-98a0-031d2d6fe3da/id-preview-442edc11--23fbf327-c71a-4781-a047-103adbc2fb66.lovable.app-1783642424609.png" },
     ],
     links: [
       {
